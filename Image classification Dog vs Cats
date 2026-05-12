@@ -1,0 +1,32 @@
+PRETRAINED ALEXNET (or resnet18, squeezenet)
+net = alexnet; % or: resnet18, squeezenet
+
+%% SELECT IMAGE FROM MATLAB DRIVE
+[file, path] = uigetfile({'.jpg;.jpeg;*.png','Image Files'}, 'Select a Cat or Dog Image');
+img = imread(fullfile(path, file));
+
+if size(img,3) == 1
+    img = cat(3, img, img, img);
+end
+
+% AlexNet expects 227x227, resnet18 expects 224x224
+imgR  = imresize(img, [227 227]);
+label = classify(net, imgR);
+labelStr = char(label);
+
+%% SHOW RESULT
+figure;
+imshow(img);
+
+% AlexNet knows "tabby cat", "Persian cat", "golden retriever" etc.
+% So check if the label CONTAINS the word cat or dog
+if contains(lower(labelStr), 'cat') || contains(lower(labelStr), 'tabby') || ...
+        contains(lower(labelStr), 'kitten') || contains(lower(labelStr), 'persian')
+    title('THIS IS A CAT', 'FontSize', 22, 'Color', 'red', 'FontWeight', 'bold');
+    disp('THIS IS A CAT');
+else
+    title('THIS IS A DOG', 'FontSize', 22, 'Color', 'blue', 'FontWeight', 'bold');
+    disp('THIS IS A DOG');
+end
+disp(['Raw prediction: ' labelStr]);
+
